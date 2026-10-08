@@ -97,59 +97,156 @@ RSpec.describe Interface do
         expect(interface).to receive(:puts).with("Game Logic Error. Move Invalid. Please confirm input.\n\n")
         interface.input(screenshot: screenshot, test_mode: false)
       end
-
-      # all this bellow this comment is supposed to go into the other helper function later...
-
-      # test cases we must account for:
-      # NOTE: take a piece syntax, is later transformed into MOVE TO syntax at the beggining of the function, but must be accounted for.
-
-      # + PIECE not on specified place must return Logic Error & Mention Reason
-      specify "PIECE not on specified place must return Logic Error & Mention Reason"
-      # + PIECE to position that is not valid for that piece must return logic error.
-      specify "PIECE to position that is not valid for that piece must return logic error."
-      # + PIECE trying to go to a position where another piece (SAME COLOR) is at (invalid)
-      specify "PIECE trying to go to a position where another piece (SAME COLOR) is at (invalid)"
-      # + PIECE trying to move but it puts the king on check
-      specify "PIECE trying to move but it puts the king on check"
-      # + PIECE trying to take a PIECE that isn't there.
-      specify "PIECE trying to take a PIECE that isn't there."
-      # + PIECE trying to take a PIECE on the SAME TEAM/COLOR
-      specify "PIECE trying to take a PIECE on the SAME TEAM/COLOR"
-      # + PIECE trying to take a PIECE but move is not valid
-      specify "PIECE not on specified place must return Logic Error & Mention Reason"
-
-      context 'when on a new game with default configuration' do
-        it 'corretly captures the "KNIGHT to F3" input' do
-          
-        end
-        it 'corretly captures the "KNIGHT on B-FILE to F3" input' do
-          
-        end
-        it 'corretly captures the "PAWN on B-FILE to B3" input' do
-          
-        end
-        it 'corretly captures the "PAWN on B-FILE to B4" input' do
-          
-        end
-        it 'it reprompts when impossible to do the move "QUEEN to F7" input' do
-          
-        end
-      end
-      context 'when in the middle of a game with a non default configuration' do
-        # put game state here to test stuff out with queen, bishop and rook.
-      
-        it 'corretly captures the "QUEEN to F7" input' do
-          
-        end
-        it 'corretly captures the "ROOK to A1" input' do
-          
-        end
-        it 'it reprompts when move possible by many pieces, asking for more info "ROOK to F1" input' do
-          
-        end
-      end
       
       it 'sends the input correctly to GameObject' do
+        allow(interface).to receive(:puts)
+        allow(interface).to receive(:validate_input).and_return({
+          FROM: {
+            "KNIGHT": ["F", 1]
+          },
+          TO: {
+            "KNIGHT": ["E", 3]
+          }
+        })
+        expect(interface.input(screenshot: screenshot, test_mode: false)).to eq()
+      end
+    end
+  end
+
+  describe '#validate_input' do
+    ### FUNCTION ACCEPTANCE SPECS
+
+    # all this bellow this comment is supposed to go into the other helper function later...
+
+    # test cases we must account for:
+    # NOTE: take a piece syntax, is later transformed into MOVE TO syntax at the beggining of the function, but must be accounted for.
+
+    # + PIECE not on specified place must return Logic Error & Mention Reason
+    specify "PIECE not on specified place must return Logic Error & Mention Reason"
+    # + PIECE to position that is not valid for that piece must return logic error.
+    specify "PIECE to position that is not valid for that piece must return logic error."
+    # + PIECE trying to go to a position where another piece (SAME COLOR) is at (invalid)
+    specify "PIECE trying to go to a position where another piece (SAME COLOR) is at (invalid)"
+    # + PIECE trying to move but it puts the king on check
+    specify "PIECE trying to move but it puts the king on check"
+    # + PIECE trying to take a PIECE that isn't there.
+    specify "PIECE trying to take a PIECE that isn't there."
+    # + PIECE trying to take a PIECE on the SAME TEAM/COLOR
+    specify "PIECE trying to take a PIECE on the SAME TEAM/COLOR"
+    # + PIECE trying to take a PIECE but move is not valid
+    specify "PIECE not on specified place must return Logic Error & Mention Reason"
+
+    context 'when on a new game with default configuration' do
+      describe 'Pawn to e4' do
+        it 'corretly evaluates "PAWN to E4"' do
+          
+        end
+        it 'corretly evaluates "PAWN on E-FILE to E4"' do
+          
+        end
+        it 'corretly evaluates "PAWN on RANK-4 to E4"' do
+          
+        end
+      end
+      describe 'knight' do
+        describe 'Knight to g3' do
+          it 'corretly evaluates "KNIGHT to G3"' do
+            
+          end
+          it 'corretly evaluates "KNIGHT on G-FILE to G3" (error throw)' do
+            
+          end
+          it 'corretly evaluates "KNIGHT on RANK-1 to G3" (error throw)' do
+            
+          end
+        end
+        describe 'Knight to e2' do
+          it 'corretly evaluates "KNIGHT to E2" (error throw)' do
+            
+          end
+          it 'corretly evaluates "KNIGHT on G-FILE to E2" (error throw)' do
+            
+          end
+          it 'corretly evaluates "KNIGHT on RANK-1 to E2" (error throw)' do
+            
+          end
+          it 'corretly evaluates "KNIGHT takes PAWN on E-FILE" (error throw)' do
+            
+          end
+        end
+      end
+      describe 'invalid moves' do
+        describe 'invalid ranks' do
+          it 'corretly evaluates "KNIGHT on RANK-99 to E2" (error throw)' do
+            
+          end
+          it 'corretly evaluates "KNIGHT on RANK-1 to E0" (error throw)' do
+            
+          end
+          it 'corretly evaluates "KNIGHT on RANK-99 to E100" (error throw)' do
+            
+          end
+          it 'corretly evaluates "KNIGHT on RANK-A to EA" (error throw)' do
+            
+          end
+          it 'corretly evaluates "KNIGHT on RANK-A to E0" (error throw)' do
+            
+          end
+          it 'corretly evaluates "KNIGHT on RANK-1 to EA" (error throw)' do
+            
+          end
+        end
+        describe 'invalid files' do
+          it 'corretly evaluates "KNIGHT takes PAWN on H-FILE" (error throw)' do
+            
+          end
+          it 'corretly evaluates "KNIGHT on H-FILE to E2" (error throw)' do
+            
+          end
+          it 'corretly evaluates "KNIGHT on Z-FILE to E2" (error throw)' do # different kind of problem then H-FILE
+            
+          end
+          it 'corretly evaluates "PAWN on 0-FILE to E4"' do
+            
+          end
+        end
+        describe 'invalid syntax' do
+          describe 'matchers' do  
+            it 'corretly evaluates "PAWN shits-on E4"' do
+              
+            end
+            it 'corretly evaluates "PAWN on E-FILE dumps E4"' do
+              
+            end
+            it 'corretly evaluates "PAWN has-a-party-on RANK-4 all-the-way-to E4"' do # we are including the original matchers here, see if it has any effect
+            
+            end
+            it 'correctly evaluates "PAWN A-FILE A4"' do
+            
+            end
+          end
+        end
+        describe 'invalid pieces' do
+          it 'correctly evaluates "PARROT to E3"' do
+            
+          end
+        end
+      end
+      
+      it 'it reprompts when impossible to do the move "QUEEN to F7" input' do
+        
+      end
+    end
+    context 'when in the middle of a game with a non default configuration' do
+      # put game state here to test stuff out with queen, bishop and rook.
+    
+      it 'corretly captures the "QUEEN to F7" input' do
+        
+      end
+      it 'corretly captures the "ROOK to A1" input' do
+        
+      end
+      it 'it reprompts when move possible by many pieces, asking for more info "ROOK to F1" input' do
         
       end
     end
