@@ -8,21 +8,40 @@ RSpec.describe Interface do
     context 'when it is P1\'s turn' do
       let(:turn) { 0 }
       let(:players) { {
-        1 => "White",
-        2 => "Black"
+        0 => { 
+          "NAME" => "Tony Robbings",
+          "COLOR" => "RED" 
+        },
+        1 => {
+          "NAME" => "Yellow Kid",
+          "COLOR" => "YELLOW"
+        }
       } }
       let(:screenshot) { double("Screenshot") }
 
       before do
         # define screenshot double
+        allow(screenshot).to receive(:to_s).and_return(
+          "<Screenshot:ID @turn=#{turn} @players=#{players} @board=[<Piece:ID ...>, ...]>"
+        )
+        allow(screenshot).to receive(:turn).and_return(
+          turn
+        )
+        allow(screenshot).to receive(:players).and_return(
+          players
+        )
       end
 
-      it 'receives the data correctly from GameObject' do
-        test_data = ["do later"]
-        expect(interface.input(current_turn: turn, player_hash: players, screenshot: last_screenshot, test_mode: true)).to receive(:p).with(test_data)
+      it 'receives the data correctly from GameObject', focus: true do
+        test_output = "\nCURRENT TURN: #{screenshot.turn}\nPLAYER HASH: " + screenshot.players.to_s + "\nSCREENSHOT: " + screenshot.to_s + "\n\nTEST MODE? ACTIVE"
+        allow(interface).to receive(:puts)
+        expect(interface).to receive(:puts).with(test_output).ordered
+        interface.input(screenshot: screenshot, test_mode: true)
       end
       it 'asks for the correct user to input' do
-        expect(subject).to matcher
+        player_text_output = "Tony Robbings \e[31m(P1)\e[0m Please Move:\n\n"
+        expect(interface).to receive(:puts).with(player_text_output)
+        interface.input(screenshot: screenshot, test_mode: false)
       end
       it 'correctly handles a syntatically incorrect input case' do
         # e.g: inputs "Hello", instead of: 
