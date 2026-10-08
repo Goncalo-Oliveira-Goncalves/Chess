@@ -33,19 +33,39 @@ RSpec.describe Interface do
       end
 
       it 'receives the data correctly from GameObject', focus: true do
+        allow(interface).to receive(:validate_input).and_return(true)
         test_output = "\nCURRENT TURN: #{screenshot.turn}\nPLAYER HASH: " + screenshot.players.to_s + "\nSCREENSHOT: " + screenshot.to_s + "\n\nTEST MODE? ACTIVE"
         allow(interface).to receive(:puts)
         expect(interface).to receive(:puts).with(test_output).ordered
         interface.input(screenshot: screenshot, test_mode: true)
       end
       it 'asks for the correct user to input' do
+        allow(interface).to receive(:validate_input).and_return(true)
         player_text_output = "Tony Robbings \e[31m(P1)\e[0m Please Move:\n\n"
         expect(interface).to receive(:puts).with(player_text_output)
         interface.input(screenshot: screenshot, test_mode: false)
       end
       it 'correctly handles a syntatically incorrect input case' do
-        # e.g: inputs "Hello", instead of: 
+        # e.g: inputs "Hello", instead of right input
+        allow(interface).to receive(:gets).and_return("Hello")
+        allow(interface).to receive(:validate_input).and_return("ERR_SYNTAX", true)
+        allow(interface).to receive(:puts)
+        expect(interface).to receive(:puts).with("Syntax Error. Try again or type 'Help' for Syntax Info\n\n")
+        interface.input(screenshot: screenshot, test_mode: false)  
       end
+      it 'helps with syntax when you type "Help"'
+        help_text = "
+        The Syntax is as follows: 'PIECE to FILERANK'\n
+        (e.g: KNIGHT to F3)\n\n
+        
+        If multiple pieces of same type can move to that position, specify.\n
+        (e.g: KNIGHT on B-FILE to F3)\n\n
+        
+        You can also specify pieces to take instead of positions.\n
+        (e.g: KNIGHT takes PAWN on B-FILE)\n\n
+        
+        To perform a Castle or En Passant, simply pass the position you want the piece to move to.\n\n"
+
       it 'correctly handles a logically incorrect (game logic) input case' do
         # e.g: moves horse like a bishop.
       end

@@ -18,6 +18,33 @@ class Interface
     player_data = screenshot.players[player_to_play]
 
     puts "#{player_data["NAME"]} #{colors[player_data["COLOR"]]}(P#{player_to_play+1})#{colors["RESET"]} Please Move:\n\n"
+    print "→ "
     input = gets.chomp
+    
+    input_state = validate_input(input, screenshot)
+    until input_state == true
+      if input_state == "HELP"
+        puts "
+        The Syntax is as follows: 'PIECE to FILERANK'\n
+        (e.g: KNIGHT to F3)\n\n
+        
+        If multiple pieces of same type can move to that position, specify.\n
+        (e.g: KNIGHT on B-FILE to F3)\n\n
+        
+        You can also specify pieces to take instead of positions.\n
+        (e.g: KNIGHT takes PAWN on B-FILE)\n\n
+        
+        To perform a Castle or En Passant, simply pass the position you want the piece to move to.\n\n"
+      end
+      if input_state == "ERR_SYNTAX"
+        puts "Syntax Error. Try again or type 'Help' for Syntax Info\n\n"
+      end
+      if input_state == "ERR_GAMELOGIC"
+        puts "Game Logic Error. Move Invalid. Please confirm input.\n\n"
+      end
+      print "→ "
+      input = gets.chomp
+      input_state = validate_input(input, screenshot)
+    end
   end
 end
