@@ -24,17 +24,18 @@ class Interface
     input_state = validate_input(input, screenshot)
     until input_state == true
       if input_state == "HELP"
-        puts "
-        The Syntax is as follows: 'PIECE to FILERANK'\n
-        (e.g: KNIGHT to F3)\n\n
+        puts <<~TEXT
+        The Syntax is as follows: 'PIECE to FILERANK'
+        (e.g: KNIGHT to F3)
         
-        If multiple pieces of same type can move to that position, specify.\n
-        (e.g: KNIGHT on B-FILE to F3)\n\n
+        If multiple pieces of same type can move to that position, specify.
+        (e.g: KNIGHT on B-FILE to F3)
         
-        You can also specify pieces to take instead of positions.\n
-        (e.g: KNIGHT takes PAWN on B-FILE)\n\n
+        You can also specify pieces to take instead of positions.
+        (e.g: KNIGHT takes PAWN on B-FILE)
         
-        To perform a Castle or En Passant, simply pass the position you want the piece to move to.\n\n"
+        To perform a Castle or En Passant, simply pass the position you want the piece to move to."
+        TEXT
       end
       if input_state == "ERR_SYNTAX"
         puts "Syntax Error. Try again or type 'Help' for Syntax Info\n\n"

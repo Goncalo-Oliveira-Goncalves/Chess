@@ -53,22 +53,71 @@ RSpec.describe Interface do
         expect(interface).to receive(:puts).with("Syntax Error. Try again or type 'Help' for Syntax Info\n\n")
         interface.input(screenshot: screenshot, test_mode: false)  
       end
-      it 'helps with syntax when you type "Help"'
-        help_text = "
-        The Syntax is as follows: 'PIECE to FILERANK'\n
-        (e.g: KNIGHT to F3)\n\n
+      describe 'when you type' do
+        help_text = <<~TEXT
+        The Syntax is as follows: 'PIECE to FILERANK'
+        (e.g: KNIGHT to F3)
         
-        If multiple pieces of same type can move to that position, specify.\n
-        (e.g: KNIGHT on B-FILE to F3)\n\n
+        If multiple pieces of same type can move to that position, specify.
+        (e.g: KNIGHT on B-FILE to F3)
         
-        You can also specify pieces to take instead of positions.\n
-        (e.g: KNIGHT takes PAWN on B-FILE)\n\n
+        You can also specify pieces to take instead of positions.
+        (e.g: KNIGHT takes PAWN on B-FILE)
         
-        To perform a Castle or En Passant, simply pass the position you want the piece to move to.\n\n"
+        To perform a Castle or En Passant, simply pass the position you want the piece to move to."
+        TEXT
 
-      it 'correctly handles a logically incorrect (game logic) input case' do
+        before do
+          allow(interface).to receive(:puts)
+          allow(interface).to receive(:validate_input).and_return("HELP", true)
+        end
+
+        specify '"help", it helps with syntax' do
+          allow(interface).to receive(:gets).and_return("help")
+          expect(interface).to receive(:puts).with(help_text)
+        end
+        specify '"HELP", it helps with syntax' do
+          allow(interface).to receive(:gets).and_return("HELP")
+          expect(interface).to receive(:puts).with(help_text)
+        end
+        specify '"Help", it helps with syntax' do
+          allow(interface).to receive(:gets).and_return("Help")
+          expect(interface).to receive(:puts).with(help_text)
+        end
+
+        after do
+          interface.input(screenshot: screenshot, test_mode: false)
+        end
+        
+      end  
+      it 'returns game logic error, when wrong by game logic:' do
         # e.g: moves horse like a bishop.
+        allow(interface).to receive(:puts)
+        allow(interface).to receive(:validate_input).and_return("ERR_GAMELOGIC", true)
+        expect(interface).to receive(:puts).with("Game Logic Error. Move Invalid. Please confirm input.\n\n")
+        interface.input(screenshot: screenshot, test_mode: false)
       end
+
+      # all this bellow this comment is supposed to go into the other helper function later...
+
+      # test cases we must account for:
+      # NOTE: take a piece syntax, is later transformed into MOVE TO syntax at the beggining of the function, but must be accounted for.
+
+      # + PIECE not on specified place must return Logic Error & Mention Reason
+      specify "PIECE not on specified place must return Logic Error & Mention Reason"
+      # + PIECE to position that is not valid for that piece must return logic error.
+      specify "PIECE to position that is not valid for that piece must return logic error."
+      # + PIECE trying to go to a position where another piece (SAME COLOR) is at (invalid)
+      specify "PIECE trying to go to a position where another piece (SAME COLOR) is at (invalid)"
+      # + PIECE trying to move but it puts the king on check
+      specify "PIECE trying to move but it puts the king on check"
+      # + PIECE trying to take a PIECE that isn't there.
+      specify "PIECE trying to take a PIECE that isn't there."
+      # + PIECE trying to take a PIECE on the SAME TEAM/COLOR
+      specify "PIECE trying to take a PIECE on the SAME TEAM/COLOR"
+      # + PIECE trying to take a PIECE but move is not valid
+      specify "PIECE not on specified place must return Logic Error & Mention Reason"
+
       context 'when on a new game with default configuration' do
         it 'corretly captures the "KNIGHT to F3" input' do
           
