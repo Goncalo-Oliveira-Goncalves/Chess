@@ -18,6 +18,15 @@ RSpec.describe Interface do
         }
       } }
       let(:screenshot) { double("Screenshot") }
+      move_hash =
+      {
+        FROM: {
+          "KNIGHT" => ["F", 1]
+        },
+        TO: {
+          "KNIGHT" => ["E", 3]
+        }
+      }
 
       before do
         # define screenshot double
@@ -32,15 +41,15 @@ RSpec.describe Interface do
         )
       end
 
-      it 'receives the data correctly from GameObject', focus: true do
-        allow(interface).to receive(:validate_input).and_return(true)
+      it 'receives the data correctly from GameObject' do
+        allow(interface).to receive(:validate_input).and_return(move_hash)
         test_output = "\nCURRENT TURN: #{screenshot.turn}\nPLAYER HASH: " + screenshot.players.to_s + "\nSCREENSHOT: " + screenshot.to_s + "\n\nTEST MODE? ACTIVE"
         allow(interface).to receive(:puts)
         expect(interface).to receive(:puts).with(test_output).ordered
         interface.input(screenshot: screenshot, test_mode: true)
       end
       it 'asks for the correct user to input' do
-        allow(interface).to receive(:validate_input).and_return(true)
+        allow(interface).to receive(:validate_input).and_return(move_hash)
         player_text_output = "Tony Robbings \e[31m(P1)\e[0m Please Move:\n\n"
         expect(interface).to receive(:puts).with(player_text_output)
         interface.input(screenshot: screenshot, test_mode: false)
@@ -48,7 +57,7 @@ RSpec.describe Interface do
       it 'correctly handles a syntatically incorrect input case' do
         # e.g: inputs "Hello", instead of right input
         allow(interface).to receive(:gets).and_return("Hello")
-        allow(interface).to receive(:validate_input).and_return("ERR_SYNTAX", true)
+        allow(interface).to receive(:validate_input).and_return("ERR_SYNTAX", move_hash)
         allow(interface).to receive(:puts)
         expect(interface).to receive(:puts).with("Syntax Error. Try again or type 'Help' for Syntax Info\n\n")
         interface.input(screenshot: screenshot, test_mode: false)  
@@ -69,7 +78,7 @@ RSpec.describe Interface do
 
         before do
           allow(interface).to receive(:puts)
-          allow(interface).to receive(:validate_input).and_return("HELP", true)
+          allow(interface).to receive(:validate_input).and_return("HELP", move_hash)
         end
 
         specify '"help", it helps with syntax' do
@@ -93,17 +102,52 @@ RSpec.describe Interface do
       it 'returns game logic error, when wrong by game logic:' do
         # e.g: moves horse like a bishop.
         allow(interface).to receive(:puts)
-        allow(interface).to receive(:validate_input).and_return("ERR_GAMELOGIC", true)
+        allow(interface).to receive(:validate_input).and_return("ERR_GAMELOGIC", move_hash)
         expect(interface).to receive(:puts).with("Game Logic Error. Move Invalid. Please confirm input.\n\n")
         interface.input(screenshot: screenshot, test_mode: false)
       end
       
       it 'sends the input correctly to GameObject' do
-        move_hash = {
-          ""
-        }
+        # e.g: KNIGHT to F3 becomes:
+        # {
+        #   FROM: {
+        #     "KNIGHT": ["F", 1]
+        #   }
+        #   TO: {
+        #     "KNIGHT": ["E", 3]
+        #   }
+        # }
+        # 
+        # Note: it has another hash for en passent and castling scenarious (plus any custom ones.):
+        # 
+        # CASTLING:
+        # {
+        #   FROM: {
+        #     "KING": ["E", 8]
+        #     "ROOK": ["H", 8]
+        #   }
+        #   TO: {
+        #     "KING": ["G", 8]
+        #     "ROOK": ["F", 8]
+        #   }
+        # }
+        # 
+        # EN PASSENT:
+        # {
+        #   FROM: {
+        #     "PAWN": ["D", 5]
+        #     "PAWN": ["E", 5]
+        #   }
+        #   TO: {
+        #     "PAWN": ["E", 4]
+        #     "PAWN": nil
+        #   }
+        # }
+        # 
+        # NOTE: Nil represents pieces "OUT OF THE BOARD"
 
-        allow(interface).to receive(:validate_input).and_return(move_hash, true)
+        allow(interface).to receive(:gets).and_return("KNIGHT to E3\n")
+        allow(interface).to receive(:validate_input).and_return(move_hash)
         expect(interface.input(screenshot: screenshot, test_mode: false)).to eq(move_hash)
       end
     end

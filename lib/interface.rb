@@ -22,7 +22,7 @@ class Interface
     input = gets.chomp
     
     input_state = validate_input(input, screenshot)
-    until Hash === input_state
+    until input_state.is_a?(Hash)
       if input_state == "HELP"
         puts <<~TEXT
         The Syntax is as follows: 'PIECE to FILERANK'
@@ -43,6 +43,7 @@ class Interface
       if input_state == "ERR_GAMELOGIC"
         puts "Game Logic Error. Move Invalid. Please confirm input.\n\n"
       end
+      
       print "→ "
       input = gets.chomp
       input_state = validate_input(input, screenshot)
