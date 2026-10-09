@@ -22,7 +22,7 @@ class Interface
     input = gets.chomp
     
     input_state = validate_input(input, screenshot)
-    until input_state == true
+    until Hash === input_state
       if input_state == "HELP"
         puts <<~TEXT
         The Syntax is as follows: 'PIECE to FILERANK'
@@ -47,5 +47,7 @@ class Interface
       input = gets.chomp
       input_state = validate_input(input, screenshot)
     end
+
+    return input_state
   end
 end
